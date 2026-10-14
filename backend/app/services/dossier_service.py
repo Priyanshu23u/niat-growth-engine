@@ -1,0 +1,62 @@
+"""
+Dossier Service — Compiles the verifiable NIAT Family Admissions Dossier
+"""
+
+import time
+from datetime import datetime
+from typing import Dict, Any
+from backend.app.models.campus import PartnerCampus
+
+
+def generate_dossier(
+    student_name: str,
+    parent_name: str,
+    primary_campus: PartnerCampus,
+    roi_model: Dict[str, Any],
+    language: str = "en",
+) -> Dict[str, Any]:
+    """
+    Compiles an official personalized Family Admissions Dossier.
+    """
+    dossier_id = f"NIAT-DOSSIER-{str(int(time.time() * 1000))[-6:]}"
+    now_formatted = datetime.now().strftime("%d %B %Y")
+
+    emi = roi_model["inputs"]["monthlyEmi"]
+    wealth_lakhs = f"{(roi_model['metrics']['fiveYearNetWealthAdvantage'] / 100000):.1f}"
+
+    return {
+        "dossierId": dossier_id,
+        "studentName": student_name,
+        "parentName": parent_name,
+        "generatedAt": now_formatted,
+        "language": language,
+        "matchedCampus": {
+            "id": primary_campus.id,
+            "name": primary_campus.name,
+            "city": primary_campus.city,
+            "state": primary_campus.state,
+            "accreditation": primary_campus.accreditation,
+            "degreeAwarded": primary_campus.degree_awarded,
+            "annualFee": primary_campus.total_annual_fee,
+            "totalFeeFourYears": primary_campus.total_four_year_fee,
+            "labPod": primary_campus.lab_type,
+        },
+        "roiHighlights": {
+            "startingSalaryTarget": "₹8,50,000 - ₹12,00,000 LPA",
+            "tier3AverageSalary": "₹3,60,000 LPA",
+            "monthlyEmiEstimate": f"₹{emi:,}",
+            "paybackPeriodMonths": f"{roi_model['metrics']['breakEvenMonths']} Months",
+            "fiveYearNetWealthAdvantage": f"₹{wealth_lakhs} Lakhs",
+        },
+        "dualCredentials": [
+            "Formal UGC-Recognized B.Tech Degree from Host University",
+            "NSDC & NxtWave Co-Branded Industry-Ready Software Engineer Certificate",
+            "Verified GitHub Capstone Architecture Portfolio (Production AI Systems)",
+        ],
+        "nextStep": {
+            "action": "LOCK_PROVISIONAL_SEAT",
+            "tokenAmount": 10000,
+            "refundableWindowDays": 14,
+            "validityHours": 48,
+        },
+    }

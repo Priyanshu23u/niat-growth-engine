@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NIAT ParentTrust AI — Multilingual Admissions Advisory System</title>
+  <meta name="description" content="Autonomous AI-powered admissions advisor for NIAT (NxtWave Institute of Advanced Technologies). Get instant, evidence-backed answers about UGC degrees, AI job security, campus matching, and ROI — in your language." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     NAVIGATION BAR
+═══════════════════════════════════════════════════════════ -->
+<header id="main-navbar">
+  <div class="nav-inner">
+    <!-- Brand -->
+    <div class="nav-brand">
+      <div class="brand-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+      </div>
+      <div>
+        <div class="brand-name">NIAT <span class="badge badge-blue" style="font-size:0.6rem;padding:2px 7px;">PARENT TRUST AI</span></div>
+        <div class="brand-sub">NxtWave Growth Engine &nbsp;•&nbsp; <span class="live-dot"></span> Live System Active</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <nav class="nav-tabs" id="nav-tabs">
+      <button class="nav-tab active" data-tab="console" id="tab-console">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        Parent Advisory
+      </button>
+      <button class="nav-tab" data-tab="campuses" id="tab-campuses">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+        35+ Campuses
+      </button>
+      <button class="nav-tab" data-tab="roi" id="tab-roi">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+        ROI Simulator
+      </button>
+      <button class="nav-tab" data-tab="dashboard" id="tab-dashboard">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+        Growth Dashboard
+      </button>
+    </nav>
+
+    <!-- Right: Student pill + Language -->
+    <div class="nav-right">
+      <button class="student-pill" id="btn-open-profile" title="Click to edit student profile">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        <div>
+          <div class="pill-name" id="nav-student-name">Sai Teja Reddy</div>
+          <div class="pill-meta" id="nav-student-meta">NAT: 82% · Telangana</div>
+        </div>
+      </button>
+      <div class="lang-selector">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+        <select id="lang-select">
+          <option value="en">🇬🇧 English</option>
+          <option value="te" selected>🇮🇳 తెలుగు (Telugu)</option>
+          <option value="ta">🇮🇳 தமிழ் (Tamil)</option>
+          <option value="hi">🇮🇳 हिन्दी (Hindi)</option>
+          <option value="kn">🇮🇳 ಕನ್ನಡ (Kannada)</option>
+          <option value="ml">🇮🇳 മലയാളം (Malayalam)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════════════════
+     MAIN CONTENT — TABS
+═══════════════════════════════════════════════════════════ -->
+<main id="main-content">
+
+  <!-- ─── TAB: PARENT ADVISORY CONSOLE ─── -->
+  <section id="tab-content-console" class="tab-content active">
+    <div class="page-wrapper">
+
+      <!-- Hero Header -->
+      <div class="hero-card glass-panel glow-accent">
+        <div class="hero-glow-orb"></div>
+        <div class="hero-badges">
+          <span class="badge badge-blue">Track B: Bottom-of-Funnel Conversion</span>
+          <span class="badge badge-teal">Multilingual Vernacular Native</span>
+          <span class="badge badge-purple">Tool-Calling Agent Execution</span>
+        </div>
+        <h1 class="hero-title" id="hero-title">Empowering Parents with Complete Admissions Transparency</h1>
+        <p class="hero-sub" id="hero-sub">Instant, evidence-backed answers on UGC degrees, AI job security, campus matching across 35+ partner universities, and 5-year financial returns.</p>
+        <div class="candidate-pill">
+          <span class="muted">Evaluating for:</span>
+          <strong id="hero-student-name">Sai Teja Reddy</strong>
+          <span id="hero-board">(12th Board: 88%)</span>
+          <span class="dot-sep">•</span>
+          <span class="nat-score" id="hero-nat">NAT Percentile: 82%</span>
+          <span class="dot-sep">•</span>
+          <span id="hero-state">State: Telangana</span>
+        </div>
+      </div>
+
+      <!-- Main Grid -->
+      <div class="console-grid">
+
+        <!-- Left: Objection Buttons + Custom Q -->
+        <div class="objection-panel">
+          <div class="panel-label">Lethal Parental Doubts (1-Click Resolution)</div>
+          <div class="panel-sublabel">Select an objection to see the AI agent query university databases and financial models:</div>
+
+          <div class="objection-list" id="objection-list">
+            <!-- Injected by JS -->
+          </div>
+
+          <!-- Custom Question Form -->
+          <div class="glass-panel custom-q-form">
+            <label class="form-label" id="custom-q-label">Ask Any Custom Question in EN</label>
+            <textarea id="custom-question" rows="3" placeholder="Ask any question about fees, degree validity, AI careers, or campuses in your language..."></textarea>
+            <div class="form-footer">
+              <button class="btn-primary" id="btn-consult-agent">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                <span id="consult-btn-text">Consult Agent</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: AI Response -->
+        <div class="response-panel">
+          <!-- Tool Trace -->
+          <div class="tool-trace glass-panel" id="tool-trace" style="display:none;">
+            <div class="tool-trace-header">
+              <div class="trace-title">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <span id="trace-label">AI Agent Reasoning & Tool Calls</span>
+              </div>
+              <span class="model-tag" id="model-tag">NIAT Agent v2.5</span>
+            </div>
+            <div class="tool-steps" id="tool-steps"></div>
+          </div>
+
+          <!-- AI Response Card -->
+          <div class="response-card glass-panel">
+            <div class="response-header">
+              <div class="response-identity">
+                <div class="response-avatar">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+                </div>
+                <div>
+                  <div class="response-title">Verified Admissions Advisory</div>
+                  <div class="response-subtitle" id="response-for">Targeted for K. Venkatesh</div>
+                </div>
+              </div>
+              <button class="voice-btn" id="btn-voice" title="Listen to native voice narration">
+                <svg id="voice-icon-on" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                <svg id="voice-icon-off" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
+                <span id="voice-btn-text">Voice Read</span>
+              </button>
+            </div>
+
+            <!-- Response Body -->
+            <div class="response-body" id="response-body">
+              <div class="response-loading" id="response-loading" style="display:none;">
+                <div class="pulse-spinner"></div>
+                <div>Querying partner university databases & running 5-year financial models...</div>
+              </div>
+              <div id="response-text">Please select an objection prompt to begin consultation.</div>
+            </div>
+
+            <!-- ROI Quick Metrics -->
+            <div class="roi-metrics-bar" id="roi-metrics-bar" style="display:none;">
+              <div class="metric-chip">
+                <div class="metric-label" id="metric-label-campuses">Partner Campuses Matched</div>
+                <div class="metric-value blue" id="metric-campuses">— Campuses</div>
+              </div>
+              <div class="metric-chip">
+                <div class="metric-label" id="metric-label-breakeven">Payback Period</div>
+                <div class="metric-value green" id="metric-breakeven">— Months</div>
+              </div>
+              <div class="metric-chip">
+                <div class="metric-label" id="metric-label-wealth">5-Year Net Wealth Gain</div>
+                <div class="metric-value purple" id="metric-wealth">+₹— Lakhs</div>
+              </div>
+            </div>
+
+            <!-- CTA Buttons -->
+            <div class="response-ctas">
+              <button class="btn-primary flex-1" id="btn-open-dossier">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                <span id="dossier-btn-text">Download Official Dossier (PDF)</span>
+              </button>
+              <button class="btn-secondary flex-1 amber-border" id="btn-open-seat">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                <span id="seat-btn-text">Lock Provisional Seat (₹10,000 Refundable)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── TAB: CAMPUS EXPLORER ─── -->
+  <section id="tab-content-campuses" class="tab-content">
+    <div class="page-wrapper">
+      <div class="section-header">
+        <div class="section-badges">
+          <span class="badge badge-teal">35+ Partner Universities</span>
+          <span class="badge badge-blue">UGC & AICTE Approved</span>
+        </div>
+        <h2 class="section-title">NIAT Partner Campus Explorer</h2>
+        <p class="section-sub">Every campus awards a UGC-recognized B.Tech degree. Filter by your state, budget, and NAT score to find your perfect match.</p>
+      </div>
+
+      <!-- Filters -->
+      <div class="campus-filters glass-panel">
+        <div class="filter-group">
+          <label>State / Region</label>
+          <select id="filter-state">
+            <option value="All">All States</option>
+            <option value="Telangana">Telangana</option>
+            <option value="Andhra Pradesh">Andhra Pradesh</option>
+            <option value="Tamil Nadu">Tamil Nadu</option>
+            <option value="Karnataka">Karnataka</option>
+            <option value="Maharashtra">Maharashtra</option>
+            <option value="Uttar Pradesh">Uttar Pradesh</option>
+            <option value="Kerala">Kerala</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Max Annual Budget (₹ Lakhs)</label>
+          <select id="filter-budget">
+            <option value="">Any Budget</option>
+            <option value="280000">Up to ₹2.8L</option>
+            <option value="310000">Up to ₹3.1L</option>
+            <option value="360000">Up to ₹3.6L</option>
+            <option value="500000">Any</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Search Campus / City</label>
+          <input type="text" id="filter-keyword" placeholder="e.g. Hyderabad, AI, Cloud..." />
+        </div>
+        <button class="btn-primary" id="btn-filter-campuses">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          Search Campuses
+        </button>
+      </div>
+
+      <!-- Campus Cards Grid -->
+      <div class="campus-grid" id="campus-grid">
+        <!-- Injected by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── TAB: ROI SIMULATOR ─── -->
+  <section id="tab-content-roi" class="tab-content">
+    <div class="page-wrapper">
+      <div class="section-header">
+        <div class="section-badges">
+          <span class="badge badge-teal">Transparent Financial Modeling</span>
+          <span class="badge badge-blue">5-Year Career Net Worth Projection</span>
+        </div>
+        <h2 class="section-title">NIAT vs Traditional Tier-3 College: Financial ROI Simulator</h2>
+        <p class="section-sub">Skeptical parents often ask: <em>"Why pay ₹8L–₹12L for NIAT when local state colleges cost ₹3L–₹4L?"</em> Simulate education loan EMIs, post-tax take-home pay, and the exact break-even timeline below.</p>
+      </div>
+
+      <div class="roi-grid">
+        <!-- Sliders -->
+        <div class="roi-sliders glass-panel">
+          <div class="slider-header">Adjust Financial Assumptions</div>
+          <div class="slider-group">
+            <div class="slider-row">
+              <span>NIAT Total 4-Year Program Investment:</span>
+              <strong class="blue" id="lbl-niat-fee">₹12.0 Lakhs</strong>
+            </div>
+            <input type="range" id="slider-niat-fee" min="800000" max="1600000" step="50000" value="1200000" />
+          </div>
+          <div class="slider-group">
+            <div class="slider-row">
+              <span>Local Tier-3 College 4-Year Fee:</span>
+              <strong id="lbl-tier3-fee">₹4.0 Lakhs</strong>
+            </div>
+            <input type="range" id="slider-tier3-fee" min="200000" max="600000" step="25000" value="400000" />
+          </div>
+          <div class="slider-group">
+            <div class="slider-row">
+              <span>NIAT Target Starting Package (AI/Full-Stack):</span>
+              <strong class="green" id="lbl-niat-salary">₹8.5 LPA</strong>
+            </div>
+            <input type="range" id="slider-niat-salary" min="600000" max="1500000" step="50000" value="850000" />
+          </div>
+          <div class="slider-group">
+            <div class="slider-row">
+              <span>Tier-3 Mass IT Recruiter Starting Package:</span>
+              <strong id="lbl-tier3-salary">₹3.6 LPA</strong>
+            </div>
+            <input type="range" id="slider-tier3-salary" min="280000" max="500000" step="20000" value="360000" />
+          </div>
+          <div class="slider-group">
+            <div class="slider-row">
+              <span id="lbl-loan-pct-label">Education Loan Share: 60%</span>
+              <strong class="amber" id="lbl-emi">EMI: ₹—/mo</strong>
+            </div>
+            <input type="range" id="slider-loan-pct" min="0" max="100" step="10" value="60" />
+          </div>
+        </div>
+
+        <!-- Results -->
+        <div class="roi-results">
+          <div class="roi-stat-cards">
+            <div class="roi-stat-card green-card">
+              <div class="stat-label">Break-Even Payback Period</div>
+              <div class="stat-value green" id="roi-breakeven">— Months</div>
+              <div class="stat-sub green-sub" id="roi-breakeven-yrs"></div>
+            </div>
+            <div class="roi-stat-card blue-card">
+              <div class="stat-label">5-Year Net Wealth Gain</div>
+              <div class="stat-value blue" id="roi-wealth">+₹— Lakhs</div>
+              <div class="stat-sub blue-sub">Net after tuition & loan EMI</div>
+            </div>
+            <div class="roi-stat-card amber-card">
+              <div class="stat-label">Year 1 Starting Delta</div>
+              <div class="stat-value amber" id="roi-year1-delta">+₹— LPA</div>
+              <div class="stat-sub amber-sub" id="roi-monthly-delta"></div>
+            </div>
+          </div>
+
+          <!-- Year-by-Year Chart -->
+          <div class="glass-panel projection-chart">
+            <div class="chart-header">
+              <div class="chart-title">5-Year Net Cumulative Wealth Comparison</div>
+              <div class="chart-legend">
+                <span><span class="legend-dot blue-dot"></span>NIAT Graduate</span>
+                <span><span class="legend-dot gray-dot"></span>Tier-3 College</span>
+              </div>
+            </div>
+            <div id="roi-chart-bars"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── TAB: GROWTH DASHBOARD ─── -->
+  <section id="tab-content-dashboard" class="tab-content">
+    <div class="page-wrapper">
+      <div class="section-header">
+        <div class="section-badges">
+          <span class="badge badge-purple">Executive Growth Telemetry</span>
+          <span class="badge badge-teal">Layer 3: Connected System Evaluation</span>
+        </div>
+        <h2 class="section-title">Growth Manager Command Center: Track B Experiment Analytics</h2>
+        <p class="section-sub">Evaluating the 14-day controlled trial: Replacing human tele-calling friction with the Autonomous Multilingual Parent Trust Engine to unlock scalable bottom-of-funnel conversion.</p>
+      </div>
+
+      <!-- Top KPI Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card green-card">
+          <div class="kpi-top"><span class="muted-sm">Conversion Lift</span><span class="badge badge-teal">+57% Relative</span></div>
+          <div class="kpi-value green">2.1% → 3.3%</div>
+          <div class="kpi-sub">+1.2% Absolute Lead-to-Paid Seat Lift</div>
+        </div>
+        <div class="kpi-card blue-card">
+          <div class="kpi-top"><span class="muted-sm">Blended CAC</span><span class="badge badge-blue">-36% Cost</span></div>
+          <div class="kpi-value blue">₹47.6k → ₹30.3k</div>
+          <div class="kpi-sub">Savings of ₹17,300 per enrolled student</div>
+        </div>
+        <div class="kpi-card purple-card">
+          <div class="kpi-top"><span class="muted-sm">Incremental Tuition ARR</span><span class="badge badge-purple">+120 Seats/mo</span></div>
+          <div class="kpi-value purple">+₹14.40 Crores</div>
+          <div class="kpi-sub">Annualized top-line revenue addition</div>
+        </div>
+        <div class="kpi-card amber-card">
+          <div class="kpi-top"><span class="muted-sm">Sales Closing Velocity</span><span class="badge badge-amber">-54% Cycle</span></div>
+          <div class="kpi-value amber">14 Days → 6.2 Days</div>
+          <div class="kpi-sub">Instant trust resolution at peak intent</div>
+        </div>
+      </div>
+
+      <!-- A/B Funnel Comparison -->
+      <div class="glass-panel funnel-card">
+        <div class="funnel-title">A/B Test Design: Control Funnel vs Track B Parent Trust Engine</div>
+        <div class="funnel-grid">
+          <!-- Control -->
+          <div class="funnel-col control-col">
+            <div class="funnel-col-header">Control: Human Tele-Calling</div>
+            <div class="funnel-step">
+              <span>Lead Contact Rate</span>
+              <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:58%;background:#475569;"></div><span>58%</span></div>
+            </div>
+            <div class="funnel-step">
+              <span>Consultation Rate</span>
+              <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:34%;background:#475569;"></div><span>34%</span></div>
+            </div>
+            <div class="funnel-step">
+              <span>Conversion Rate</span>
+              <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:12%;background:#475569;"></div><span>2.1%</span></div>
+            </div>
+            <div class="funnel-step">
+              <span>Languages Served</span>
+              <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:17%;background:#475569;"></div><span>1</span></div>
+            </div>
+          </div>
+          <!-- Experiment -->
+          <div class="funnel-col experiment-col">
+            <div class="funnel-col-header experiment-header">Track B: Parent Trust AI Engine</div>
+            <div class="funnel-step">
+              <span>Lead Contact Rate</span>
+              <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:100%;background:linear-gradient(90deg,#0066ff,#00d2ff);"></div><span>100%</span></div>
+            </div>
+            <div class="funnel-step">
+              <span>Consultation Rate</span>
+              <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:89%;background:linear-gradient(90deg,#0066ff,#00d2ff);"></div><span>89%</span></div>
+            </div>
+            <div class="funnel-step">
+              <span>Conversion Rate</span>
+              <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:20%;background:linear-gradient(90deg,#0066ff,#00d2ff);"></div><span>3.3%</span></div>
+            </div>
+            <div class="funnel-step">
+              <span>Languages Served</span>
+              <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:100%;background:linear-gradient(90deg,#0066ff,#00d2ff);"></div><span>6</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Webhook Test + Lead Table -->
+      <div class="dash-bottom-grid">
+        <div class="glass-panel webhook-card">
+          <div class="webhook-header">
+            <div>
+              <div style="font-weight:700;font-size:0.95rem;">WhatsApp Dossier Dispatch — Live Webhook Test</div>
+              <div class="muted-sm">Trigger a simulated WhatsApp dispatch via the webhook API</div>
+            </div>
+            <button class="btn-primary" id="btn-trigger-webhook">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+              <span id="webhook-btn-text">Send Test Dispatch</span>
+            </button>
+          </div>
+          <div class="webhook-log" id="webhook-log" style="display:none;"></div>
+        </div>
+
+        <div class="glass-panel leads-card">
+          <div class="leads-header">
+            <div style="font-weight:700;font-size:0.95rem;">Recent Lead Pipeline — Live Telemetry</div>
+            <span class="badge badge-teal" id="leads-count-badge">Loading...</span>
+          </div>
+          <div class="leads-table-wrap">
+            <table class="leads-table">
+              <thead>
+                <tr><th>Student</th><th>Parent</th><th>Language</th><th>State</th><th>NAT</th><th>Status</th></tr>
+              </thead>
+              <tbody id="leads-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ─────────────────────────────────────────────────────── 
+     FOOTER
+─────────────────────────────────────────────────────── -->
+<footer id="main-footer">
+  <div class="footer-inner">
+    <div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+        <span style="font-weight:800;color:#f8fafc;font-size:1rem;">NIAT Growth Engine</span>
+        <span class="badge badge-blue" style="font-size:0.6rem;">Track B: Parent Trust System</span>
+      </div>
+      <div>Built for NxtWave Jr. Growth Manager Challenge · 4-Year Upskilling & Degree Network across 35+ Partner Universities.</div>
+    </div>
+    <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+      <a href="https://www.niatindia.com/" target="_blank" rel="noreferrer" class="footer-link">NIAT Official Website ↗</a>
+      <a href="https://www.ccbp.in/" target="_blank" rel="noreferrer" class="footer-link">NxtWave CCBP ↗</a>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════════════════════
+     MODALS
+═══════════════════════════════════════════════════════════ -->
+
+<!-- Dossier Modal -->
+<div class="modal-overlay" id="modal-dossier" style="display:none;">
+  <div class="modal-box dossier-modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          Official NIAT Family Admissions Dossier
+        </div>
+        <div class="muted-sm" id="dossier-id-text">ID: NIAT-DOSSIER-XXXXXX</div>
+      </div>
+      <button class="modal-close" data-modal="dossier">✕</button>
+    </div>
+    <div class="modal-body" id="dossier-body">
+      <!-- Injected by JS -->
+    </div>
+    <div class="modal-footer">
+      <button class="btn-primary" id="btn-print-dossier">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+        Print / Save as PDF
+      </button>
+      <button class="btn-secondary" id="btn-dossier-to-seat" data-modal="dossier">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+        Lock Provisional Seat →
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Seat Reservation Modal -->
+<div class="modal-overlay" id="modal-seat" style="display:none;">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+        Lock Provisional Seat
+      </div>
+      <button class="modal-close" data-modal="seat">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="seat-info glass-panel" id="seat-info-box">
+        <div class="seat-campus-name" id="seat-campus-name">Campus Name</div>
+        <div class="seat-meta">Provisional Seat — Valid for 48 Hours</div>
+        <div class="seat-token">Token Amount: ₹10,000 (100% Refundable within 14 days)</div>
+      </div>
+      <form id="seat-form" class="seat-form">
+        <div class="form-group">
+          <label>Student Name</label>
+          <input type="text" id="seat-student-name" required />
+        </div>
+        <div class="form-group">
+          <label>Parent Name</label>
+          <input type="text" id="seat-parent-name" required />
+        </div>
+        <div class="form-group">
+          <label>Parent WhatsApp Number</label>
+          <input type="tel" id="seat-parent-phone" placeholder="+91 XXXXX XXXXX" required />
+        </div>
+        <div class="form-footer" style="margin-top:20px;">
+          <button type="submit" class="btn-primary" style="width:100%;justify-content:center;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            <span id="seat-submit-text">Reserve Provisional Seat</span>
+          </button>
+        </div>
+      </form>
+      <div id="seat-success" style="display:none;" class="seat-success-msg">
+        <div class="success-icon">✅</div>
+        <div class="success-title">Seat Reserved Successfully!</div>
+        <div class="success-sub" id="seat-success-detail"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Student Profile Modal -->
+<div class="modal-overlay" id="modal-profile" style="display:none;">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        Edit Student Profile
+      </div>
+      <button class="modal-close" data-modal="profile">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="profile-grid">
+        <div class="form-group">
+          <label>Student Name</label>
+          <input type="text" id="prof-student-name" />
+        </div>
+        <div class="form-group">
+          <label>Parent Name</label>
+          <input type="text" id="prof-parent-name" />
+        </div>
+        <div class="form-group">
+          <label>Parent WhatsApp</label>
+          <input type="tel" id="prof-parent-phone" />
+        </div>
+        <div class="form-group">
+          <label>12th Board Percentage: <strong id="prof-board-lbl">88%</strong></label>
+          <input type="range" id="prof-board" min="50" max="100" value="88" />
+        </div>
+        <div class="form-group">
+          <label>NAT Percentile: <strong id="prof-nat-lbl">82%</strong></label>
+          <input type="range" id="prof-nat" min="40" max="100" value="82" />
+        </div>
+        <div class="form-group">
+          <label>State</label>
+          <select id="prof-state">
+            <option value="Telangana">Telangana</option>
+            <option value="Andhra Pradesh">Andhra Pradesh</option>
+            <option value="Tamil Nadu">Tamil Nadu</option>
+            <option value="Karnataka">Karnataka</option>
+            <option value="Maharashtra">Maharashtra</option>
+            <option value="Uttar Pradesh">Uttar Pradesh</option>
+            <option value="Kerala">Kerala</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Annual Budget (₹): <strong id="prof-budget-lbl">₹3,00,000</strong></label>
+          <input type="range" id="prof-budget" min="200000" max="500000" step="25000" value="300000" />
+        </div>
+      </div>
+      <div class="modal-footer" style="margin-top:20px;">
+        <button class="btn-primary" id="btn-save-profile" style="width:100%;justify-content:center;">
+          Save Profile & Refresh Consultation
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
