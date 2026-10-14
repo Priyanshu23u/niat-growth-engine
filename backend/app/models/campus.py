@@ -1,6 +1,6 @@
 """
 NIAT Partner Campuses Model & Dataset
-Contains verified data for NIAT's 35+ partner university network.
+Contains verified data for NIAT's 35+ partner university network (8 representative partner campuses loaded in this demonstration dataset).
 """
 
 from typing import List, Optional

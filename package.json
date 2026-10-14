@@ -1,18 +1,11 @@
 {
   "name": "niat-growth-engine",
-  "version": "1.0.0",
-  "description": "NIAT ParentTrust AI — Autonomous Multilingual Admissions Advisory & Closer (Vanilla HTML5/CSS3/JS + Node.js Express Backend)",
-  "main": "server/index.js",
+  "version": "2.5.0",
+  "description": "NIAT ParentTrust AI — Autonomous Multilingual Admissions Advisory & Closer (Python FastAPI + Plain HTML5/CSS3/Vanilla JS)",
   "private": true,
   "scripts": {
-    "start": "node server/index.js",
-    "dev": "node server/index.js",
-    "test": "node test_system.cjs"
-  },
-  "dependencies": {
-    "express": "^4.18.2"
-  },
-  "engines": {
-    "node": ">=18.0.0"
+    "start": "python run_server.py",
+    "dev": "python run_server.py",
+    "test": "python -m pytest backend/tests -v"
   }
 }

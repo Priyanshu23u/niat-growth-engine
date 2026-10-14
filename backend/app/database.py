@@ -145,8 +145,9 @@ class InMemoryDatabase:
             conversion_rate = f"{(seats_reserved / total_leads * 100):.1f}" if total_leads > 0 else "0.0"
 
             funnel_comparison = {
+                "experimentNote": "Projected A/B Experiment Results (14-Day Trial Simulation)",
                 "control": {
-                    "label": "Control: Human Tele-Calling",
+                    "label": "Control: Human Tele-Calling (Simulation Baseline)",
                     "contactRate": 58,
                     "consultationRate": 34,
                     "conversionRate": 2.1,

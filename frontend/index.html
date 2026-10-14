@@ -211,7 +211,7 @@
           <span class="badge badge-blue">UGC & AICTE Approved</span>
         </div>
         <h2 class="section-title">NIAT Partner Campus Explorer</h2>
-        <p class="section-sub">Every campus awards a UGC-recognized B.Tech degree. Filter by your state, budget, and NAT score to find your perfect match.</p>
+        <p class="section-sub">Every campus awards a UGC-recognized B.Tech degree. Filter by your state, budget, and NAT score to find your perfect match. <span style="display:inline-block; margin-top:4px; opacity:0.85; font-size:0.9em;">(Interactive directory of 8 representative partner campuses from NIAT's 35+ university network).</span></p>
       </div>
 
       <!-- Filters -->
@@ -288,15 +288,15 @@
           </div>
           <div class="slider-group">
             <div class="slider-row">
-              <span>NIAT Target Starting Package (AI/Full-Stack):</span>
-              <strong class="green" id="lbl-niat-salary">₹8.5 LPA</strong>
+              <span>Estimated NIAT Target Starting Package (AI/Full-Stack):</span>
+              <strong class="green" id="lbl-niat-salary">Estimated ₹8.5 LPA</strong>
             </div>
             <input type="range" id="slider-niat-salary" min="600000" max="1500000" step="50000" value="850000" />
           </div>
           <div class="slider-group">
             <div class="slider-row">
-              <span>Tier-3 Mass IT Recruiter Starting Package:</span>
-              <strong id="lbl-tier3-salary">₹3.6 LPA</strong>
+              <span>Estimated Tier-3 Mass IT Recruiter Starting Package:</span>
+              <strong id="lbl-tier3-salary">Estimated ₹3.6 LPA</strong>
             </div>
             <input type="range" id="slider-tier3-salary" min="280000" max="500000" step="20000" value="360000" />
           </div>
@@ -313,17 +313,17 @@
         <div class="roi-results">
           <div class="roi-stat-cards">
             <div class="roi-stat-card green-card">
-              <div class="stat-label">Break-Even Payback Period</div>
+              <div class="stat-label">Estimated Break-Even Payback</div>
               <div class="stat-value green" id="roi-breakeven">— Months</div>
               <div class="stat-sub green-sub" id="roi-breakeven-yrs"></div>
             </div>
             <div class="roi-stat-card blue-card">
-              <div class="stat-label">5-Year Net Wealth Gain</div>
+              <div class="stat-label">Estimated 5-Year Net Wealth Gain</div>
               <div class="stat-value blue" id="roi-wealth">+₹— Lakhs</div>
               <div class="stat-sub blue-sub">Net after tuition & loan EMI</div>
             </div>
             <div class="roi-stat-card amber-card">
-              <div class="stat-label">Year 1 Starting Delta</div>
+              <div class="stat-label">Estimated Year 1 Starting Delta</div>
               <div class="stat-value amber" id="roi-year1-delta">+₹— LPA</div>
               <div class="stat-sub amber-sub" id="roi-monthly-delta"></div>
             </div>
@@ -332,13 +332,17 @@
           <!-- Year-by-Year Chart -->
           <div class="glass-panel projection-chart">
             <div class="chart-header">
-              <div class="chart-title">5-Year Net Cumulative Wealth Comparison</div>
+              <div class="chart-title">5-Year Net Cumulative Wealth Comparison (Estimated)</div>
               <div class="chart-legend">
                 <span><span class="legend-dot blue-dot"></span>NIAT Graduate</span>
                 <span><span class="legend-dot gray-dot"></span>Tier-3 College</span>
               </div>
             </div>
             <div id="roi-chart-bars"></div>
+          </div>
+
+          <div class="roi-disclaimer muted-sm" style="margin-top:14px; padding:10px 14px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:8px; font-size:0.75rem; color:#94a3b8; line-height:1.45;">
+            ℹ️ <strong>Financial Disclaimer:</strong> Salary targets and career projections are illustrative estimates modeled on standard software industry compensation and historical placement targets. Individual financial outcomes depend on student performance, market conditions, and partner university recruitment.
           </div>
         </div>
       </div>
@@ -383,7 +387,8 @@
 
       <!-- A/B Funnel Comparison -->
       <div class="glass-panel funnel-card">
-        <div class="funnel-title">A/B Test Design: Control Funnel vs Track B Parent Trust Engine</div>
+        <div class="funnel-title">Projected A/B Experiment Results (14-Day Trial Simulation)</div>
+        <div style="font-size:0.8rem; color:#94a3b8; margin-top:-4px; margin-bottom:12px;">Simulated 14-day projection: Human Tele-Calling Control vs. Track B Parent Trust AI Engine</div>
         <div class="funnel-grid">
           <!-- Control -->
           <div class="funnel-col control-col">
@@ -497,6 +502,7 @@
           Official NIAT Family Admissions Dossier
         </div>
         <div class="muted-sm" id="dossier-id-text">ID: NIAT-DOSSIER-XXXXXX</div>
+        <div class="muted-sm" style="font-size:0.72rem; color:#94a3b8; margin-top:2px;">(Advisory report generated by NIAT ParentTrust AI Tool · Not issued directly by NIAT or host universities)</div>
       </div>
       <button class="modal-close" data-modal="dossier">✕</button>
     </div>

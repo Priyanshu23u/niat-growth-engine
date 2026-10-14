@@ -44,7 +44,7 @@ def dispatch_webhook(body: WebhookRequest):
         recipient=phone,
         languageDispatched=language,
         dispatchedText=message_content,
-        crmSyncStatus="LEADSQUARED_OPPORTUNITY_UPDATED",
+        crmSyncStatus="CRM_SYNC_SIMULATED",
         eventTimestamp=datetime.now(timezone.utc).isoformat(),
         deliveryEstimateSeconds=random.randint(2, 5),
     )

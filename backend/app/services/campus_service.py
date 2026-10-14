@@ -1,5 +1,5 @@
 """
-Campus Service — Query and Filtering logic for 35+ Partner Campuses
+Campus Service — Query and Filtering logic for NIAT's 35+ Partner Campuses (8 representative campuses in demo dataset)
 """
 
 from typing import List, Optional, Dict, Any
