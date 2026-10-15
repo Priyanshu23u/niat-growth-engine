@@ -14,7 +14,8 @@ async def consult_agent(body: AgentRequestBody):
     """
     Executes the multi-tool autonomous AI admissions advisor.
     Queries partner campuses, computes ROI, reviews curriculum,
-    and runs Gemini LLM reasoning to address parent objections.
+    and runs Groq LLM reasoning (Llama 3.3 / Llama 3.1) or deterministic
+    multi-tool standby engine to address parent objections.
     """
     try:
         response = await process_admissions_question(body)

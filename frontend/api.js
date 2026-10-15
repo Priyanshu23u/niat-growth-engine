@@ -138,7 +138,7 @@ async function apiTriggerWebhook(webhookPayload) {
 }
 
 /**
- * Check backend health & Gemini status
+ * Check backend health & Groq AI status
  * Calls GET /api/health
  */
 async function apiCheckHealth() {

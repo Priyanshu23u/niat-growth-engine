@@ -21,10 +21,13 @@ def test_health_endpoints():
     assert res1.status_code == 200
     assert res1.json()["status"] == "healthy"
     assert "FastAPI" in res1.json()["framework"]
+    assert "groqConfigured" in res1.json()
+    assert res1.json().get("aiProvider") == "Groq"
 
     res2 = client.get("/api/health")
     assert res2.status_code == 200
     assert res2.json()["status"] == "healthy"
+    assert "groqConfigured" in res2.json()
 
 
 def test_get_campuses_api():
@@ -72,7 +75,8 @@ def test_agent_api_endpoint():
     assert res.status_code == 200
     data = res.json()
     assert data["success"] is True
-    assert len(data["executedTools"]) == 4
+    assert len(data["executedTools"]) >= 2
+    assert "provider" in data
     assert data["dossierData"]["dossierId"].startswith("NIAT-DOSSIER-")
 
 

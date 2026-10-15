@@ -35,6 +35,8 @@ class AgentResponseBody(BaseModel):
     success: bool
     agentResponse: str
     aiModelUsed: str
+    provider: Optional[str] = "fallback"
+    executionMode: Optional[str] = "deterministic_fallback"
     language: str
     executedTools: List[ToolExecutionRecord]
     primaryCampus: Dict[str, Any]

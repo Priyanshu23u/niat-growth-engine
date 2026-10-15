@@ -21,7 +21,7 @@ This application has been strictly built with **zero frontend frameworks** and *
   - **Pydantic v2:** Rigorous request and response contract validation.
   - **httpx:** High-performance async HTTP client for external AI model inference.
   - **Autonomous Tool-Calling Agent:** 4 registered execution tools (`tool_query_campuses`, `tool_calculate_roi`, `tool_compare_curriculum`, `tool_generate_dossier`).
-  - **AI Model Integration:** Google Gemini 1.5 Flash via REST API with a resilient native multilingual synthesis fallback engine (Telugu, Tamil, Hindi, Kannada, Malayalam, English).
+  - **AI Model Integration:** Groq (Llama-3.3-70b-versatile / Llama-3.1-8b-instant) via OpenAI-compatible REST API with native tool-calling and a resilient native multilingual synthesis fallback engine (Telugu, Tamil, Hindi, Kannada, Malayalam, English).
   - **Zero Node.js/Express:** No Node.js runtime or Express.js server in the backend architecture.
 
 ---
@@ -47,12 +47,12 @@ niat-growth-engine/
 │   │   │   ├── leads.py          # GET/POST /api/leads & /api/reserve-seat
 │   │   │   └── webhook.py        # POST /api/webhook (WhatsApp nurture simulator)
 │   │   ├── agents/               # Autonomous Agent Logic
-│   │   │   ├── admissions_agent.py # Agent orchestrator, Gemini prompt & tool dispatcher
+│   │   │   ├── admissions_agent.py # Agent orchestrator, Groq prompt & tool dispatcher
 │   │   │   └── tools.py          # Executable Python tools called by the agent
 │   │   ├── services/             # Domain Services & Business Logic
 │   │   │   ├── campus_service.py # Filtering, sorting, and eligibility checks
 │   │   │   ├── roi_calculator.py # Standard banking annuity EMI & salary projections
-│   │   │   ├── gemini_service.py # Async HTTP client for Google Gemini 1.5 Flash
+│   │   │   ├── groq_service.py   # Async HTTP client for Groq AI inference & tool calling
 │   │   │   └── dossier_service.py # Official Family Admissions Dossier generator
 │   │   ├── models/               # Domain Entities & Master Datasets
 │   │   │   ├── campus.py         # Partner campus catalog (fees, locations, NAT cutoffs)
@@ -118,9 +118,10 @@ cp backend/.env.example .env
 
 Edit `.env` (optional for local testing; the agent has an autonomous native fallback if no key is set):
 ```env
-# Optional: Set your real Gemini API key to enable live Google Gemini 1.5 Flash inference
-GEMINI_API_KEY=your_gemini_api_key_here
-GEMINI_MODEL=gemini-1.5-flash
+# Optional: Set your real Groq API key to enable live Llama 3.3/3.1 inference
+# Obtain at: https://console.groq.com/keys
+GROQ_API_KEY=your_groq_api_key_here
+GROQ_MODEL=llama-3.3-70b-versatile
 
 # Server Configuration
 HOST=0.0.0.0
@@ -140,6 +141,40 @@ The application will start on **`http://localhost:8000`** and serve:
 - The **FastAPI REST API** at `http://localhost:8000/api/...`.
 - Interactive **Swagger API Documentation** at `http://localhost:8000/docs`.
 - OpenAPI schema specification at `http://localhost:8000/openapi.json`.
+
+---
+
+## 4. Deploying to Vercel (Step-by-Step)
+
+The project includes built-in Vercel configuration (`vercel.json`, `api/index.py`, and `requirements.txt`).
+
+### Option A: Deploy via GitHub (Recommended)
+1. Push your repository to **GitHub**.
+2. Go to [vercel.com](https://vercel.com) and click **"Add New..." → "Project"**.
+3. Import your GitHub repository.
+4. **Project Settings:**
+   - **Root Directory:** If deploying from the whole repo, set Root Directory to `niat-growth-engine` (or leave default if the repository itself is `niat-growth-engine`).
+   - **Framework Preset:** Select **Other**.
+5. **Environment Variables:**
+   - Add `GROQ_API_KEY`: *(Your key from console.groq.com)*
+   - Add `GROQ_MODEL`: `llama-3.3-70b-versatile` (or `llama-3.1-8b-instant`)
+6. Click **Deploy**. Vercel will install dependencies via `@vercel/python` and publish your live app on an `https://*.vercel.app` domain.
+
+### Option B: Deploy via Vercel CLI
+```bash
+# 1. Install Vercel CLI (if not already installed)
+npm install -g vercel
+
+# 2. Navigate to project directory
+cd niat-growth-engine
+
+# 3. Deploy
+vercel
+
+# 4. Deploy to production
+vercel --prod
+```
+During the CLI prompt, specify the optional environment variables (`GROQ_API_KEY`).
 
 ---
 
@@ -197,8 +232,8 @@ The AI Admissions Agent does not produce generic text; it uses an autonomous dec
 - **Start Command:** `python run_server.py`
 - **Environment Variables:**
   - `PORT=8000` (or host provided)
-  - `HOST=0.0.0.0`
-  - `GEMINI_API_KEY=<your-key>`
+  - `GROQ_API_KEY=<your-key>`
+  - `GROQ_MODEL=llama-3.3-70b-versatile`
 
 ### Option B: Dockerfile
 ```dockerfile

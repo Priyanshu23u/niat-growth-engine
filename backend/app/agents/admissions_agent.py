@@ -1,10 +1,13 @@
 """
 Admissions Agent — Autonomous Multilingual Admissions Advisory & Closer
-Orchestrates tool executions, Google Gemini 1.5 Flash reasoning, and resilient fallback synthesizer.
+Orchestrates genuine tool-calling via Groq (Llama 3.3 / Llama 3.1) with
+an authentic multilingual deterministic fallback engine when API credentials are absent.
 """
 
 import os
-from typing import Dict, Any, List
+import json
+import logging
+from typing import Dict, Any, List, Optional
 from backend.app.schemas.agent import AgentRequestBody, AgentResponseBody, ToolExecutionRecord
 from backend.app.agents.tools import (
     tool_query_campuses,
@@ -12,17 +15,111 @@ from backend.app.agents.tools import (
     tool_compare_curriculum,
     tool_generate_dossier,
 )
-from backend.app.services.gemini_service import query_gemini_api
+from backend.app.services.groq_service import call_groq_chat, is_groq_configured, get_groq_model
+
+logger = logging.getLogger("admissions_agent")
+
+# OpenAI-compatible tool specifications for Groq function calling
+GROQ_TOOLS: List[Dict[str, Any]] = [
+    {
+        "type": "function",
+        "function": {
+            "name": "tool_query_campuses",
+            "description": "Query and rank NIAT partner university campuses based on state, annual budget, and student NAT percentile.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "state": {
+                        "type": "string",
+                        "description": "Indian state preference (e.g. Telangana, Andhra Pradesh, Maharashtra, Karnataka, Tamil Nadu, Uttar Pradesh, Kerala)",
+                    },
+                    "budget_max": {
+                        "type": "integer",
+                        "description": "Maximum annual tuition budget in INR (e.g. 300000)",
+                    },
+                    "min_nat_score": {
+                        "type": "integer",
+                        "description": "Minimum NAT exam percentile (0-100)",
+                    },
+                },
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "tool_calculate_roi",
+            "description": "Compute 5-year post-tax financial ROI, monthly loan EMI, and break-even payback period comparing NIAT against traditional tier-3 colleges.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "niat_fee": {
+                        "type": "integer",
+                        "description": "Total 4-year NIAT program fee in INR (e.g. 1200000)",
+                    },
+                    "tier3_fee": {
+                        "type": "integer",
+                        "description": "Total 4-year tier-3 college fee in INR (default 400000)",
+                    },
+                    "starting_salary": {
+                        "type": "integer",
+                        "description": "Expected NIAT starting salary in INR (default 850000)",
+                    },
+                },
+                "required": ["niat_fee"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "tool_compare_curriculum",
+            "description": "Compare 8-semester curriculum of NIAT (applied GenAI, autonomous agents, Lab 5.0) against traditional tier-3 university theory syllabus.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "focus_areas": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "Focus areas to compare, e.g. ['AI_Threat', 'Coding_Hours', 'Accreditation']",
+                    }
+                },
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "tool_generate_dossier",
+            "description": "Generate the verified personalized NIAT Family Admissions Dossier with accreditation, fee schedule, and provisional seat token.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "student_name": {"type": "string", "description": "Student full name"},
+                    "parent_name": {"type": "string", "description": "Parent full name"},
+                    "language": {"type": "string", "description": "Language code (en, te, ta, hi, kn, ml)"},
+                },
+            },
+        },
+    },
+]
+
+ALLOWED_TOOL_NAMES = {
+    "tool_query_campuses",
+    "tool_calculate_roi",
+    "tool_compare_curriculum",
+    "tool_generate_dossier",
+}
 
 
 async def process_admissions_question(body: AgentRequestBody) -> AgentResponseBody:
     """
-    Executes the autonomous agent pipeline:
-    1. Query partner campuses tool
-    2. Calculate ROI model tool
-    3. Compare curriculum tool
-    4. Call Google Gemini LLM API (if key available) or fallback synthesizer
-    5. Generate official Family Admissions Dossier tool
+    Executes the autonomous admissions advisory workflow:
+    1. If Groq API key is present: sends prompt + profile to Groq with native tool-calling.
+       Validates and executes requested tools on the server, feeds back tool results,
+       and lets Groq synthesize the final authoritative multilingual advice.
+    2. If Groq API key is absent or API fails: executes only the relevant tools based on
+       the objection category and synthesizes authentic vernacular responses.
     """
     profile = body.studentProfile
     student_name = (profile.studentName or profile.name or "Student Aspirant") if profile else "Student Aspirant"
@@ -36,69 +133,157 @@ async def process_admissions_question(body: AgentRequestBody) -> AgentResponseBo
     objection_category = body.objectionCategory or "custom"
     prompt = body.prompt
 
-    executed_tools: List[ToolExecutionRecord] = []
-
-    # 1. TOOL 1: Query partner campuses
-    campuses_result = tool_query_campuses(
-        state=state,
-        budget_max=budget,
-        min_nat_score=nat_score,
-    )
+    # Baseline primary campus and ROI data to ensure UI integrity
+    campuses_result = tool_query_campuses(state=state, budget_max=budget, min_nat_score=nat_score)
     primary_campus = campuses_result["primary_campus"]
     matched_campuses = campuses_result["matched_campuses"]
-    executed_tools.append(campuses_result["record"])
 
-    # 2. TOOL 2: Calculate ROI and loan EMI model
-    roi_result = tool_calculate_roi(
-        niat_fee=primary_campus.total_four_year_fee,
-        tier3_fee=400000,
-        starting_salary=850000,
-    )
+    roi_result = tool_calculate_roi(niat_fee=primary_campus.total_four_year_fee)
     roi_model = roi_result["roi_model"]
-    executed_tools.append(roi_result["record"])
 
-    # 3. TOOL 3: Curriculum comparison
-    curriculum_result = tool_compare_curriculum()
-    executed_tools.append(curriculum_result["record"])
+    executed_tools: List[ToolExecutionRecord] = []
+    agent_response_text: str = ""
+    ai_model_used: str = "Deterministic Multi-Tool Engine (Standby Mode)"
+    provider: str = "fallback"
+    execution_mode: str = "deterministic_fallback"
 
-    # 4. Gemini 1.5 Flash Model Reasoning
-    api_key = os.environ.get("GEMINI_API_KEY")
-    agent_response_text = ""
-    ai_model_used = "NIAT Domain Expert Agent (Deterministic Multi-Tool Engine)"
-
-    if api_key:
-        wealth_lakhs = f"{(roi_model['metrics']['fiveYearNetWealthAdvantage'] / 100000):.1f}"
-        monthly_emi = roi_model["inputs"]["monthlyEmi"]
-
+    # ─────────────────────────────────────────────────────────────
+    # PATH A: LIVE GROQ MODEL INFERENCE (Native Tool-Calling)
+    # ─────────────────────────────────────────────────────────────
+    if is_groq_configured():
+        model_name = get_groq_model()
         system_prompt = f"""You are the Senior NIAT Admissions & Parent Trust Advisory Agent.
-You are conversing with {parent_name}, parent of {student_name}.
-Student Academic Profile: Class 12 Board: {board_percentage}%, NAT Percentile: {nat_score}%, State: {state}, Budget: ₹{budget}/year.
-Matched Campus: {primary_campus.name} located in {primary_campus.city}, {primary_campus.state}.
-Accreditation: {primary_campus.accreditation}.
-Degree: {primary_campus.degree_awarded} (awarded by the UGC-recognized host university) + NSDC Industry-Ready Certificate from NxtWave.
-ROI Metrics: 5-Year net wealth advantage: ₹{wealth_lakhs} Lakhs. Break-even: {roi_model['metrics']['breakEvenMonths']} months.
-Monthly education loan EMI: ₹{monthly_emi:,}.
-NIAT Curriculum: 4 years of applied GenAI, Autonomous Agents, Full-Stack and 1,500+ hiring partners.
+You are conversing with {parent_name}, parent of prospective student {student_name}.
+Student Academic Profile: Class 12: {board_percentage}%, NAT Percentile: {nat_score}%, State: {state}, Budget: ₹{budget}/year.
+Primary Recommended Campus: {primary_campus.name} ({primary_campus.city}, {primary_campus.state}).
+Accreditation: {primary_campus.accreditation}, Degree: {primary_campus.degree_awarded}.
 
-CRITICAL INSTRUCTION:
-Respond in the language requested: "{language}".
-If language is "te" (Telugu), write fluent, respectful, reassuring Telugu.
-If language is "ta" (Tamil), write fluent, respectful, reassuring Tamil.
-If language is "hi" (Hindi), write fluent, respectful, reassuring Hindi.
-If language is "kn" (Kannada), write fluent, respectful, reassuring Kannada.
-If language is "ml" (Malayalam), write fluent, respectful, reassuring Malayalam.
-If language is "en" (English), write clear, empathetic, authoritative English.
+You have access to 4 approved server tools:
+- tool_query_campuses: search partner universities
+- tool_calculate_roi: compute 5-year wealth advantage and loan EMI
+- tool_compare_curriculum: analyze curriculum differences vs legacy engineering
+- tool_generate_dossier: generate official admissions dossier
 
-Address the parent's specific question with complete transparency, factual evidence, concrete numbers, and reassuring parental empathy. Do not use generic buzzwords. Explain exactly how the university grants the degree and how NxtWave builds the student's career."""
+INSTRUCTIONS:
+1. Call ONLY the tools that are genuinely required to answer the parent's specific question.
+2. Respond strictly in the parent's requested language code: "{language}" (te=Telugu, ta=Tamil, hi=Hindi, kn=Kannada, ml=Malayalam, en=English).
+3. Be reassuring, factual, respectful, and transparent. Do not invent unapproved degrees or partner institutions."""
 
-        user_prompt = f'Parent Question / Objection: "{prompt}"'
-        gemini_text = await query_gemini_api(system_prompt, user_prompt, api_key=api_key)
-        if gemini_text:
-            agent_response_text = gemini_text
-            ai_model_used = "Google Gemini 1.5 Flash (via Tool-Calling Pipeline)"
+        messages: List[Dict[str, Any]] = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": f'Parent Question / Objection: "{prompt}" (Category: {objection_category})'},
+        ]
 
-    # Fallback synthesizer if Gemini was unavailable or returned empty
+        initial_res = await call_groq_chat(
+            messages=messages,
+            tools=GROQ_TOOLS,
+            tool_choice="auto",
+            model=model_name,
+        )
+
+        if initial_res:
+            tool_calls = initial_res.get("tool_calls", [])
+
+            if tool_calls:
+                # Groq requested one or more tool executions
+                messages.append(initial_res["raw_message"])
+
+                for tc in tool_calls:
+                    fn_name = tc.get("function", {}).get("name", "")
+                    if fn_name not in ALLOWED_TOOL_NAMES:
+                        logger.warning(f"Rejected unapproved tool call from model: {fn_name}")
+                        continue
+
+                    raw_args = tc.get("function", {}).get("arguments", "{}")
+                    try:
+                        args = json.loads(raw_args) if isinstance(raw_args, str) else raw_args
+                    except Exception:
+                        args = {}
+
+                    tool_output_summary = ""
+
+                    if fn_name == "tool_query_campuses":
+                        q_state = str(args.get("state", state))[:50]
+                        q_budget = min(max(int(args.get("budget_max", budget)), 100000), 2000000)
+                        q_nat = min(max(int(args.get("min_nat_score", nat_score)), 0), 100)
+                        res = tool_query_campuses(state=q_state, budget_max=q_budget, min_nat_score=q_nat)
+                        primary_campus = res["primary_campus"]
+                        matched_campuses = res["matched_campuses"]
+                        executed_tools.append(res["record"])
+                        tool_output_summary = res["record"].outputSummary
+
+                    elif fn_name == "tool_calculate_roi":
+                        n_fee = min(max(int(args.get("niat_fee", primary_campus.total_four_year_fee)), 200000), 3000000)
+                        res = tool_calculate_roi(niat_fee=n_fee)
+                        roi_model = res["roi_model"]
+                        executed_tools.append(res["record"])
+                        tool_output_summary = res["record"].outputSummary
+
+                    elif fn_name == "tool_compare_curriculum":
+                        res = tool_compare_curriculum()
+                        executed_tools.append(res["record"])
+                        tool_output_summary = res["record"].outputSummary
+
+                    elif fn_name == "tool_generate_dossier":
+                        res = tool_generate_dossier(
+                            student_name=student_name,
+                            parent_name=parent_name,
+                            primary_campus=primary_campus,
+                            roi_model=roi_model,
+                            language=language,
+                        )
+                        executed_tools.append(res["record"])
+                        tool_output_summary = res["record"].outputSummary
+
+                    messages.append({
+                        "role": "tool",
+                        "tool_call_id": tc.get("id", f"call_{fn_name}"),
+                        "name": fn_name,
+                        "content": json.dumps({"status": "success", "summary": tool_output_summary}),
+                    })
+
+                # Second turn: Groq synthesizes final response based on tool results
+                final_res = await call_groq_chat(
+                    messages=messages,
+                    model=model_name,
+                )
+
+                if final_res and final_res.get("text"):
+                    agent_response_text = final_res["text"]
+                    ai_model_used = f"Groq {final_res.get('model', model_name)} (Autonomous Tool-Calling)"
+                    provider = "groq"
+                    execution_mode = "live_ai"
+                else:
+                    # Groq returned empty synthesis — fall through to deterministic fallback
+                    logger.warning("[Agent] Groq second-turn returned empty text; using deterministic fallback.")
+
+            elif initial_res.get("text"):
+                # Model directly answered without calling tools
+                agent_response_text = initial_res["text"]
+                ai_model_used = f"Groq {initial_res.get('model', model_name)} (Direct Reasoning)"
+                provider = "groq"
+                execution_mode = "live_ai"
+            else:
+                # Groq returned neither tool calls nor text — fall through to deterministic fallback
+                logger.warning("[Agent] Groq initial response was empty (no text, no tool_calls); using deterministic fallback.")
+
+    # ─────────────────────────────────────────────────────────────
+    # PATH B: AUTHENTIC DETERMINISTIC MULTI-TOOL FALLBACK
+    # ─────────────────────────────────────────────────────────────
     if not agent_response_text:
+        # Deliberately select and execute only the tools relevant to the objection category
+        if objection_category == "campus_matching":
+            executed_tools = [campuses_result["record"], roi_result["record"]]
+        elif objection_category == "roi_financial":
+            executed_tools = [roi_result["record"], campuses_result["record"]]
+        elif objection_category in ("accreditation", "ai_threat"):
+            curr_res = tool_compare_curriculum()
+            executed_tools = [campuses_result["record"], curr_res["record"]]
+        else:
+            # Multi-tool comprehensive consultation
+            curr_res = tool_compare_curriculum()
+            executed_tools = [campuses_result["record"], roi_result["record"], curr_res["record"]]
+
         agent_response_text = generate_multilingual_fallback(
             language=language,
             objection_category=objection_category,
@@ -107,22 +292,28 @@ Address the parent's specific question with complete transparency, factual evide
             primary_campus=primary_campus,
             roi_model=roi_model,
         )
+        ai_model_used = "Deterministic Multi-Tool Engine (Standby Mode)"
+        provider = "fallback"
+        execution_mode = "deterministic_fallback"
 
-    # 5. TOOL 4: Assemble official Family Admissions Dossier
-    dossier_result = tool_generate_dossier(
+    # Always ensure the official Admissions Dossier tool is executed for complete client modal rendering
+    dossier_res = tool_generate_dossier(
         student_name=student_name,
         parent_name=parent_name,
         primary_campus=primary_campus,
         roi_model=roi_model,
         language=language,
     )
-    dossier_data = dossier_result["dossier"]
-    executed_tools.append(dossier_result["record"])
+    dossier_data = dossier_res["dossier"]
+    if not any(t.toolName == "tool_generate_dossier" for t in executed_tools):
+        executed_tools.append(dossier_res["record"])
 
     return AgentResponseBody(
         success=True,
         agentResponse=agent_response_text,
         aiModelUsed=ai_model_used,
+        provider=provider,
+        executionMode=execution_mode,
         language=language,
         executedTools=executed_tools,
         primaryCampus=primary_campus.model_dump(),

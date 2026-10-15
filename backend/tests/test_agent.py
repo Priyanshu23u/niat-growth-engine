@@ -3,7 +3,7 @@ Unit Tests: AI Admissions Agent Tools & Pipeline
 """
 
 import sys
-import pytest
+import json
 from pathlib import Path
 
 # Add project root to path
@@ -113,6 +113,102 @@ def test_agent_pipeline_execution():
     )
     response = asyncio.run(process_admissions_question(body))
     assert response.success is True
-    assert len(response.executedTools) == 4
+    assert len(response.executedTools) >= 2
+    assert response.provider in ("fallback", "groq")
     assert "గౌరవనీయులైన" in response.agentResponse or "UGC" in response.agentResponse
     assert response.dossierData["dossierId"].startswith("NIAT-DOSSIER-")
+
+
+def test_groq_service_unconfigured():
+    from backend.app.services.groq_service import is_groq_configured, call_groq_chat
+    import asyncio
+    import os
+
+    # Temporarily ensure GROQ_API_KEY is not set
+    old_key = os.environ.pop("GROQ_API_KEY", None)
+    try:
+        assert is_groq_configured() is False
+        res = asyncio.run(call_groq_chat([{"role": "user", "content": "Hello"}]))
+        assert res is None
+    finally:
+        if old_key:
+            os.environ["GROQ_API_KEY"] = old_key
+
+
+def test_groq_service_mocked_tool_calling(monkeypatch):
+    import asyncio
+    from unittest.mock import AsyncMock
+    from backend.app.agents import admissions_agent
+
+    # Mock call_groq_chat to simulate Groq tool calling
+    mock_groq = AsyncMock()
+    # Turn 1: model requests tool_query_campuses
+    turn1 = {
+        "text": "",
+        "tool_calls": [
+            {
+                "id": "call_123",
+                "function": {
+                    "name": "tool_query_campuses",
+                    "arguments": json.dumps({"state": "Telangana", "budget_max": 350000}),
+                },
+            }
+        ],
+        "model": "llama-3.3-70b-versatile",
+        "finish_reason": "tool_calls",
+        "raw_message": {"role": "assistant", "tool_calls": []},
+    }
+    # Turn 2: model synthesizes final answer grounded in tool output
+    turn2 = {
+        "text": "Based on verified university data, NIAT @ Chaitanya University offers UGC-recognized degrees.",
+        "tool_calls": [],
+        "model": "llama-3.3-70b-versatile",
+        "finish_reason": "stop",
+    }
+    mock_groq.side_effect = [turn1, turn2]
+
+    monkeypatch.setattr(admissions_agent, "call_groq_chat", mock_groq)
+    monkeypatch.setattr(admissions_agent, "is_groq_configured", lambda: True)
+
+    body = AgentRequestBody(
+        prompt="Which campus is best in Telangana?",
+        language="en",
+        objectionCategory="campus_matching",
+        studentProfile=StudentProfile(studentName="Rahul", state="Telangana"),
+    )
+    res = asyncio.run(admissions_agent.process_admissions_question(body))
+
+    assert res.success is True
+    assert res.provider == "groq"
+    assert res.executionMode == "live_ai"
+    assert "Chaitanya University" in res.agentResponse
+    assert any(t.toolName == "tool_query_campuses" for t in res.executedTools)
+    assert any(t.toolName == "tool_generate_dossier" for t in res.executedTools)
+
+
+def test_groq_service_direct_reasoning(monkeypatch):
+    import asyncio
+    from unittest.mock import AsyncMock
+    from backend.app.agents import admissions_agent
+
+    mock_groq = AsyncMock()
+    mock_groq.return_value = {
+        "text": "Every NIAT student receives a formal UGC-recognized degree from our host university.",
+        "tool_calls": [],
+        "model": "llama-3.3-70b-versatile",
+        "finish_reason": "stop",
+    }
+
+    monkeypatch.setattr(admissions_agent, "call_groq_chat", mock_groq)
+    monkeypatch.setattr(admissions_agent, "is_groq_configured", lambda: True)
+
+    body = AgentRequestBody(
+        prompt="Is the degree genuine?",
+        language="en",
+        objectionCategory="accreditation",
+    )
+    res = asyncio.run(admissions_agent.process_admissions_question(body))
+
+    assert res.success is True
+    assert res.provider == "groq"
+    assert "UGC-recognized" in res.agentResponse

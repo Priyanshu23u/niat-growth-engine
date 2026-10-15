@@ -42,12 +42,13 @@ if __name__ == "__main__":
     print(f"   API Docs:     http://localhost:{port}/docs")
     print(f"   Health Check: http://localhost:{port}/health")
     print(f"   Technology:   Python FastAPI + Plain HTML5/CSS3/Vanilla JS")
-    gemini_key = os.environ.get("GEMINI_API_KEY")
-    if gemini_key:
-        print("   [+] Gemini AI: ENABLED (Live LLM responses active)")
+    groq_key = os.environ.get("GROQ_API_KEY")
+    groq_model = os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")
+    if groq_key:
+        print(f"   [+] Groq AI: ENABLED (Live LLM: {groq_model})")
     else:
-        print("   [o] Gemini AI: STANDBY (Deterministic Multi-Tool Engine active)")
-        print("       Set GEMINI_API_KEY in environment or .env to activate live LLM")
+        print("   [o] Groq AI: STANDBY (Deterministic Multi-Tool Engine active)")
+        print("       Set GROQ_API_KEY in environment or .env to activate live Groq inference")
     print("=" * 60 + "\n")
 
     uvicorn.run("backend.app.main:app", host=host, port=port, reload=False)
